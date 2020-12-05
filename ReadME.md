@@ -1,3 +1,3 @@
 # How to Run
 
-Just compile with g++ and run the output file and change the functor equation. Not all cases fully covered. Doesnt work with larger than 1 digit array items
+There is an example in the code of a valid expression, feel free to change the size of the array structure, the operators (*, +, -, /) and the arrangement (x*2 vs 2*x)
