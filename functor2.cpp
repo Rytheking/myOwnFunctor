@@ -2,6 +2,7 @@
 #include <string>
 #include <regex>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -84,406 +85,268 @@ class Tokenizer
 	}
 };
 
-bool isFunctor(Tokenizer tokens)
+int digit(Token t)
 {
-	
-    Token t=tokens.next();
-    Token t2=tokens.next();
-    if(t==NAME && t2==OPENBRACK)
-    {
-        t=tokens.next();
-		i=-1;
-        while(t!=CLOSEBRACK){
+	if(t==ONE)
+	{
+		return 1;
+	}
+	else if(t==TWO)
+	{
+		return 2;
+	}
+	else if(t==THREE)
+	{
+		return 3;
+	}
+	else if(t==FOUR)
+	{
+		return 4;
+	}
+	else if(t==FIVE)
+	{
+		return 5;
+	}
+	else if(t==SIX)
+	{
+		return 6;
+	}
+	else if(t==SEVEN)
+	{
+		return 7;
+	}
+	else if(t==EIGHT)
+	{
+		return 8;
+	}
+	else if(t==NINE)
+	{
+		return 9;
+	}
+	return 0;
+}
+
+int findC(Tokenizer tokens)
+{
+	int column=0, tempInt=0;
+	vector<int> temp;
+	Token t=tokens.next();
+	while(t!=MUL && t!=DIV&&t!=ADD&&t!=SUB&&t!=EMPTYTOKEN)
+	{
+		column++;
+		temp.push_back(digit(t));
+		t=tokens.next();
+	}
+	for(int i=0; i<temp.size(); i++)
+	{
+		column-=1;
+		tempInt+=(pow(10, column)*temp[i]);
+	}
+	c=tempInt;
+	return c;
+}
+
+vector<int> operationVarFirst(Tokenizer tokens)
+{
+	Token t=tokens.next();
+	if(t==MUL)
+	{
+		c=findC(tokens);
+		i=0;
+		cout<<list.size()<<endl;
+		while(i<list.size())
+		{
+			list[i]=list[i]*c;
+			i++;
+		}
+								
+	}
+	else if(t==DIV)
+	{
+		c=findC(tokens);
+		i=0;
+		while(i<list.size())
+		{						
+			list[i]=list[i]/c;
+			i++;				
+		}
+	}
+	else if(t==ADD)
+	{
+		c=findC(tokens);
+		i=0;
+		while(i<list.size())
+		{
+									
+			list[i]=list[i]+c;
+			i++;
+		}
+	}
+	else if(t==SUB)
+	{
+		c=findC(tokens);
+		i=0;
+		while(i<list.size())
+		{
+									
+			list[i]=list[i]-c;
+			i++;
+		}
+	}
+	return list;
+}
+vector<int> operationCostFirst(Token tokens)
+{
+	Token t=tokens;
+	if(t==MUL)
+	{
+		i=0;
+		cout<<list.size()<<endl;
+		while(i<list.size())
+		{
+			list[i]=c*list[i];
+			i++;
+		}
+								
+	}
+	else if(t==DIV)
+	{
+		i=0;
+		while(i<list.size())
+		{						
+			list[i]=c/list[i];
+			i++;				
+		}
+	}
+	else if(t==ADD)
+	{
+		i=0;
+		while(i<list.size())
+		{
+									
+			list[i]=c+list[i];
+			i++;
+		}
+	}
+	else if(t==SUB)
+	{
+		i=0;
+		while(i<list.size())
+		{
+									
+			list[i]=c-list[i];
+			i++;
+		}
+	}
+	return list;
+}
+
+
+Tokenizer arrayCon(Tokenizer tokens)
+{
+	Token t=tokens.next();
+	vector<int> temp;
+	int column=0, curr=0, c;
+	while(t!=CLOSEBRACK){
+
 			if(t!=COMMA)
-            if(t==ZERO)
-            {
-                list.push_back(0);
-            }
-			else if(t==ONE)
 			{
-				list.push_back(1);
+				temp.push_back(digit(t));
+				column++;
 			}
-			else if(t==TWO)
+			else if(t==COMMA)
 			{
-				list.push_back(2);
-			}
-			else if(t==THREE)
-			{
-				list.push_back(3);
-			}
-			else if(t==FOUR)
-			{
-				list.push_back(4);
-			}
-			else if(t==FIVE)
-			{
-				list.push_back(5);
-			}
-			else if(t==SIX)
-			{
-				list.push_back(6);
-			}
-			else if(t==SEVEN)
-			{
-				list.push_back(7);
-			}
-			else if(t==EIGHT)
-			{
-				list.push_back(8);
-			}
-			else if(t==NINE)
-			{
-				list.push_back(9);
+				for(int i=0; i<temp.size();i++)
+				{
+					column-=1;
+					curr+=(pow(10,column)*temp[i]);
+					cout<<column<<endl;
+				}
+				//cout<<"Digit "<<c<<endl<<"Curr"<<curr<<endl<<"Column "<<column<<endl<<"power "<<(pow(10,column))<<"\n";;
+				list.push_back(curr);
+				curr=0;
+				column=0;
+				temp.clear();
 			}
 			t=tokens.next();
         }
+		for(int i=0; i<temp.size();i++)
+		{
+			column-=1;
+			curr+=(pow(10,column)*temp[i]);
+			cout<<column<<endl;
+		}
+		list.push_back(curr);
 		int j=0;
 		while(j<list.size())
 		{
 			cout<<list[j]<<endl;
 			j++;
 		}
+		return tokens;
+}
+
+bool isFunctor(Tokenizer tokens)
+{
+    Token t=tokens.next();
+    Token t2=tokens.next();
+    if(t==NAME && t2==OPENBRACK)
+    {
+        //t=tokens.next();
+		i=-1;
+        tokens=arrayCon(tokens);
 		t=tokens.next();
 		t2=tokens.next();
         if(t==FUNCTOR && t2==OPENPAREN)
         {
-			
 			t=tokens.next();
             if(t==NAME)
             {
-				
 				t=tokens.next();
 				t2=tokens.next();
                 if(t==CLOSEPAREN and t2 == FUNCSYM)
                 {
-					
 					t=tokens.next();
-						if(t== ZERO|t== ONE|t== TWO|t== THREE|t== FOUR|t== FIVE|t== SIX|t== SEVEN|t== EIGHT|t== NINE)
-						{
-							if(t==ZERO)
-							{
-								c=0;
-							}
-							else if(t==ONE)
-							{
-								c=1;
-							}
-							else if(t==TWO)
-							{
-								c=2;
-							}
-							else if(t==THREE)
-							{
-								c=3;
-							}
-							else if(t==FOUR)
-							{
-								c=4;
-							}
-							else if(t==FIVE)
-							{
-								c=5;
-							}
-							else if(t==SIX)
-							{
-								c=6;
-							}
-							else if(t==SEVEN)
-							{
-								c=7;
-							}
-							else if(t==EIGHT)
-							{
-								c=8;
-							}
-							else if(t==NINE)
-							{
-								c=9;
-							}
-							t=tokens.next();
-							if(t==MUL)
-							{
-								i=0;
-								cout<<list.size()<<endl;
-								while(i<list.size())
-								{
-									list[i]=list[i]*c;
-									i++;
-								}
-								
-							}
-							else if(t==DIV)
-							{
-								i=0;
-								while(i<list.size())
-								{
-									
-									list[i]=c/list[i];
-									i++;
-								
-								}
-							}
-							else if(t==ADD)
-							{
-								i=0;
-								while(i<list.size())
-								{
-									
-									list[i]=list[i]+c;
-									i++;
-								}
-							}
-							else if(t==SUB)
-							{
-								i=0;
-								while(i<list.size())
-								{
-									
-									list[i]=c-list[i];
-									i++;
-								}
-							}
-							
-						}
-						else
-						{
-							t=tokens.next();
-							if(t==MUL)
-							{
-								i=0;
-								t=tokens.next();
-								cout<<t<<endl;
-							if(t==ZERO)
-							{
-								c=0;
-							}
-							else if(t==ONE)
-							{
-								c=1;
-							}
-							else if(t==TWO)
-							{
-								c=2;
-							}
-							else if(t==THREE)
-							{
-								c=3;
-							}
-							else if(t==FOUR)
-							{
-								c=4;
-							}
-							else if(t==FIVE)
-							{
-								c=5;
-							}
-							else if(t==SIX)
-							{
-								c=6;
-							}
-							else if(t==SEVEN)
-							{
-								c=7;
-							}
-							else if(t==EIGHT)
-							{
-								c=8;
-							}
-							else if(t==NINE)
-							{
-								c=9;
-							}
-								while(i<list.size())
-								{
-									list[i]=list[i]*c;
-									i++;
-								}
-							}
-							else if(t==DIV)
-							{
-								i=-1;
-								t=tokens.next();
-							if(t==ZERO)
-							{
-								c=0;
-							}
-							else if(t==ONE)
-							{
-								c=1;
-							}
-							else if(t==TWO)
-							{
-								c=2;
-							}
-							else if(t==THREE)
-							{
-								c=3;
-							}
-							else if(t==FOUR)
-							{
-								c=4;
-							}
-							else if(t==FIVE)
-							{
-								c=5;
-							}
-							else if(t==SIX)
-							{
-								c=6;
-							}
-							else if(t==SEVEN)
-							{
-								c=7;
-							}
-							else if(t==EIGHT)
-							{
-								c=8;
-							}
-							else if(t==NINE)
-							{
-								c=9;
-							}
-								while(i<list.size())
-								{
-									
-									list[i]=list[i]/c;
-									i++;
-								}
-							}
-							else if(t==ADD)
-							{
-								int i=0;
-								t=tokens.next();
-							if(t==ZERO)
-							{
-								c=0;
-							}
-							else if(t==ONE)
-							{
-								c=1;
-							}
-							else if(t==TWO)
-							{
-								c=2;
-							}
-							else if(t==THREE)
-							{
-								c=3;
-							}
-							else if(t==FOUR)
-							{
-								c=4;
-							}
-							else if(t==FIVE)
-							{
-								c=5;
-							}
-							else if(t==SIX)
-							{
-								c=6;
-							}
-							else if(t==SEVEN)
-							{
-								c=7;
-							}
-							else if(t==EIGHT)
-							{
-								c=8;
-							}
-							else if(t==NINE)
-							{
-								c=9;
-							}
-								while(i<list.size())
-								{
-									
-									list[i]=list[i]+c;
-									i++;
-								}
-							}
-							else if(t==SUB)
-							{
-								int i=0;
-								t=tokens.next();
-							if(t==ZERO)
-							{
-								c=0;
-							}
-							else if(t==ONE)
-							{
-								c=1;
-							}
-							else if(t==TWO)
-							{
-								c=2;
-							}
-							else if(t==THREE)
-							{
-								c=3;
-							}
-							else if(t==FOUR)
-							{
-								c=4;
-							}
-							else if(t==FIVE)
-							{
-								c=5;
-							}
-							else if(t==SIX)
-							{
-								c=6;
-							}
-							else if(t==SEVEN)
-							{
-								c=7;
-							}
-							else if(t==EIGHT)
-							{
-								c=8;
-							}
-							else if(t==NINE)
-							{
-								c=9;
-							}
-								i=-1;
-								while(i<list.size())
-								{
-									
-									list[i]=list[i]-c;
-									i++;
-								}
-							}
-							
-						} 
-						j=-1;
-						while(j<list.size())
-						{
-							cout<<list[j++]<<endl;
-						}
-						//return true;
-                } 
-				else{
-					cout<<"hey4"<<endl;
-					} 
-            } 
-			else{
-				cout<<"hey3"<<endl;
+					if(t!=NAME)
+					{
+						vector<int> temp;
+						int column=0;
+						c=findC(tokens);
+						cout<<"c"<<c<<endl;
+						operationCostFirst(t);
+					}
+					else if(t==NAME)
+					{
+						//t=tokens.next();
+						operationVarFirst(tokens);
+					}
+				}
+				else
+				{
+					cout<<"expected ) followed by =>"<<endl;
 				} 
-        } 
-		else{
-			cout<<"hey2"<<endl;
+            } 
+			else
+			{
+				cout<<"expected a NAME"<<endl;
 			} 
-    } 
-	else{
-		cout<<"hey1"<<endl;
+        } 
+		else
+		{
+			cout<<"expected fn followed by ("<<endl;
 		} 
+    } 
+	else
+	{
+		cout<<"expected an array"<<endl;
+	} 
 	return false;
 }
 
 int main(int argc, char* argv[])
 {
     //NAME OPENBRACK DATA CLOSEPAREN FUNCTOR OPENPAREN FUNCVAR CLOSEPAREN FUNCTORSYM VAR|NUMBER OP VAR|NUMBER
-    string a = "args[1,2,3,4,5] fn(x)=> x*2";
+    string a = "args[10,240,3,4,5] fn(x)=> x/2";
 	Tokenizer to(a,"a",1);
 	isFunctor(to);
 	int j=0;
